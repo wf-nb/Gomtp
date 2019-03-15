@@ -1,7 +1,6 @@
 # MTProxy-Go
 MTProxy -Go version script
-```from doubi
-```
+`from doubi`
 =====
 ## mtproxy.sh
 
