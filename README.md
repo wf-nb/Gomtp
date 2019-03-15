@@ -1,7 +1,6 @@
 # MTProxy-Go
 MTProxy -Go version script
-```
-from doubi
+```from doubi
 ```
 =====
 ## mtproxy.sh
@@ -17,7 +16,7 @@ from doubi
 
 #### 下载安装:
 ``` bash
-wget -N --no-check-certificate https://raw.githubusercontent.com/wulimaxh/linux-netspeed/master/tcp.sh && chmod +x tcp.sh && ./tcp.sh
+wget -N --no-check-certificate https://raw.githubusercontent.com/wulimaxh/MTProxy-Go/master/mtproxy_go.sh && chmod +x tcp.sh && ./tcp.sh
 ```
 
 
