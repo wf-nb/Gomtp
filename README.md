@@ -17,7 +17,7 @@ MTProxy -Go version script
 
 #### 下载安装:
 ``` bash
-wget -N --no-check-certificate https://raw.githubusercontent.com/wulimaxh/MTProxy-Go/master/mtproxy_go.sh && chmod +x tcp.sh && ./tcp.sh
+wget -N --no-check-certificate https://raw.githubusercontent.com/wulimaxh/MTProxy-Go/master/mtproxy_go.sh && chmod +x mtproxy_go.sh && ./mtproxy_go.sh
 ```
 
 
