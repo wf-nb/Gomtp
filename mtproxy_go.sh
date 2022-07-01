@@ -106,7 +106,7 @@ Download(){
 	else
 		bit="arm"
 	fi
-	wget --no-check-certificate -N "https://github.com/9seconds/mtg/releases/download/v${new_ver}/mtg-${new_ver}-linux-${bit}"
+	wget --no-check-certificate -N "https://github.com/9seconds/mtg/releases/download/v${new_ver}/mtg-${new_ver}-linux-${bit}.tar.gz"
 	[[ ! -e "mtg-linux-${bit}" ]] && echo -e "${Error} MTProxy 下载失败 !" && rm -rf "${file}" && exit 1
 	mv "mtg-linux-${bit}" "mtg"
 	[[ ! -e "mtg" ]] && echo -e "${Error} MTProxy 重命名失败 !" && rm -rf "${file}" && exit 1
