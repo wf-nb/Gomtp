@@ -93,24 +93,28 @@ check_ver_comparison(){
 	fi
 }
 Download(){
-	if [[ ! -e "${file}" ]]; then
-		mkdir "${file}"
-	else
-		[[ -e "${mtproxy_file}" ]] && rm -rf "${mtproxy_file}"
-	fi
-	cd "${file}"
+	[[ -e "${file}" ]] && rm -rf "${file}"
+	#if [[ ! -e "${file}" ]]; then
+	#	mkdir "${file}"
+	#else
+	#	[[ -e "${mtproxy_file}" ]] && rm -rf "${mtproxy_file}"
+	#fi
 	if [[ ${bit} == "x86_64" ]]; then
 		bit="amd64"
+	elif [[ ${bit} == "aarch64" ]]; then
+		bit="arm64"
 	elif [[ ${bit} == "i386" || ${bit} == "i686" ]]; then
 		bit="386"
 	else
 		bit="arm"
 	fi
 	wget --no-check-certificate -N "https://github.com/9seconds/mtg/releases/download/v${new_ver}/mtg-${new_ver}-linux-${bit}.tar.gz"
-	[[ ! -e "mtg-linux-${bit}" ]] && echo -e "${Error} MTProxy 下载失败 !" && rm -rf "${file}" && exit 1
-	mv "mtg-linux-${bit}" "mtg"
-	[[ ! -e "mtg" ]] && echo -e "${Error} MTProxy 重命名失败 !" && rm -rf "${file}" && exit 1
-	chmod +x mtg
+	[[ ! -e "mtg-${new_ver}-linux-${bit}.tar.gz" ]] && echo -e "${Error} MTProxy 下载失败 !" && rm -rf "${file}" && exit 1
+	tar -xzvf mtg-${new_ver}-linux-${bit}.tar.gz
+	mv "mtg-${new_ver}-linux-${bit}" "${file}"
+	rm -rf mtg-${new_ver}-linux-${bit}.tar.gz
+	[[ ! -e "${mtproxy_file}" ]] && echo -e "${Error} MTProxy 重命名失败 !" && rm -rf "${file}" && exit 1
+	chmod +x ${mtproxy_file}
 	echo "${new_ver}" > ${Now_ver_File}
 }
 Service(){
