@@ -13,11 +13,11 @@ export PATH
 sh_ver="1.0.1"
 filepath=$(cd "$(dirname "$0")"; pwd)
 file_1=$(echo -e "${filepath}"|awk -F "$0" '{print $1}')
-file="/usr/local/mtproxy-go"
-mtproxy_file="/usr/local/mtproxy-go/mtg"
-mtproxy_conf="/usr/local/mtproxy-go/mtproxy.conf"
-mtproxy_log="/usr/local/mtproxy-go/mtproxy.log"
-Now_ver_File="/usr/local/mtproxy-go/ver.txt"
+file="/etc/gomtpv1"
+mtproxy_file="/etc/gomtpv1/mtg"
+mtproxy_conf="/etc/gomtpv1/mtproxy.conf"
+mtproxy_log="/etc/gomtpv1/mtproxy.log"
+Now_ver_File="/etc/gomtpv1/version.txt"
 Crontab_file="/usr/bin/crontab"
 
 Green_font_prefix="\033[32m" && Red_font_prefix="\033[31m" && Green_background_prefix="\033[42;37m" && Red_background_prefix="\033[41;37m" && Font_color_suffix="\033[0m"
@@ -119,22 +119,22 @@ Download(){
 }
 Service(){
 	if [[ ${release} = "centos" ]]; then
-		if ! wget --no-check-certificate "https://raw.githubusercontent.com/heweiye/ToyoDAdoubiBackup/master/service/mtproxy_go_centos" -O /etc/init.d/mtproxy-go; then
+		if ! wget --no-check-certificate "https://raw.githubusercontent.com/wf-nb/Gomtpv1/master/gomtpv1_centos" -O /etc/init.d/gomtpv1; then
 			echo -e "${Error} MTProxy服务 管理脚本下载失败 !"
 			rm -rf "${file}"
 			exit 1
 		fi
-		chmod +x "/etc/init.d/mtproxy-go"
-		chkconfig --add mtproxy-go
-		chkconfig mtproxy-go on
+		chmod +x "/etc/init.d/gomtpv1"
+		chkconfig --add gomtpv1
+		chkconfig gomtpv1 on
 	else
-		if ! wget --no-check-certificate "https://raw.githubusercontent.com/heweiye/ToyoDAdoubiBackup/master/service/mtproxy_go_debian" -O /etc/init.d/mtproxy-go; then
+		if ! wget --no-check-certificate "https://raw.githubusercontent.com/wf-nb/Gomtpv1/master/gomtpv1_debian" -O /etc/init.d/gomtpv1; then
 			echo -e "${Error} MTProxy服务 管理脚本下载失败 !"
 			rm -rf "${file}"
 			exit 1
 		fi
-		chmod +x "/etc/init.d/mtproxy-go"
-		update-rc.d -f mtproxy-go defaults
+		chmod +x "/etc/init.d/gomtpv1"
+		update-rc.d -f gomtpv1 defaults
 	fi
 	echo -e "${Info} MTProxy服务 管理脚本下载完成 !"
 }
@@ -363,7 +363,7 @@ Start(){
 	check_installed_status
 	check_pid
 	[[ ! -z ${PID} ]] && echo -e "${Error} MTProxy 正在运行，请检查 !" && exit 1
-	/etc/init.d/mtproxy-go start
+	/etc/init.d/gomtpv1 start
 	sleep 1s
 	check_pid
 	[[ ! -z ${PID} ]] && View
@@ -372,13 +372,13 @@ Stop(){
 	check_installed_status
 	check_pid
 	[[ -z ${PID} ]] && echo -e "${Error} MTProxy 没有运行，请检查 !" && exit 1
-	/etc/init.d/mtproxy-go stop
+	/etc/init.d/gomtpv1 stop
 }
 Restart(){
 	check_installed_status
 	check_pid
-	[[ ! -z ${PID} ]] && /etc/init.d/mtproxy-go stop
-	/etc/init.d/mtproxy-go start
+	[[ ! -z ${PID} ]] && /etc/init.d/gomtpv1 stop
+	/etc/init.d/gomtpv1 start
 	sleep 1s
 	check_pid
 	[[ ! -z ${PID} ]] && View
@@ -402,16 +402,16 @@ Uninstall(){
 			Del_iptables
 			Save_iptables
 		fi
-		if [[ ! -z $(crontab -l | grep "mtproxy_go.sh monitor") ]]; then
+		if [[ ! -z $(crontab -l | grep "gomtpv1.sh monitor") ]]; then
 			crontab_monitor_cron_stop
 		fi
 		rm -rf "${file}"
 		if [[ ${release} = "centos" ]]; then
-			chkconfig --del mtproxy-go
+			chkconfig --del gomtpv1
 		else
-			update-rc.d -f mtproxy-go remove
+			update-rc.d -f gomtpv1 remove
 		fi
-		rm -rf "/etc/init.d/mtproxy-go"
+		rm -rf "/etc/init.d/gomtpv1"
 		echo && echo "MTProxy 卸载完成 !" && echo
 	else
 		echo && echo "卸载已取消..." && echo
@@ -517,7 +517,7 @@ get_IP_address(){
 }
 Set_crontab_monitor(){
 	check_crontab_installed_status
-	crontab_monitor_status=$(crontab -l|grep "mtproxy_go.sh monitor")
+	crontab_monitor_status=$(crontab -l|grep "gomtpv1.sh monitor")
 	if [[ -z "${crontab_monitor_status}" ]]; then
 		echo && echo -e "当前监控运行状态模式: ${Red_font_prefix}未开启${Font_color_suffix}" && echo
 		echo -e "确定要开启 ${Green_font_prefix}MTProxy 服务端运行状态监控${Font_color_suffix} 功能吗？(当进程关闭则自动启动 MTProxy 服务端)[Y/n]"
@@ -542,11 +542,11 @@ Set_crontab_monitor(){
 }
 crontab_monitor_cron_start(){
 	crontab -l > "$file_1/crontab.bak"
-	sed -i "/mtproxy_go.sh monitor/d" "$file_1/crontab.bak"
-	echo -e "\n* * * * * /bin/bash $file_1/mtproxy_go.sh monitor" >> "$file_1/crontab.bak"
+	sed -i "/gomtpv1.sh monitor/d" "$file_1/crontab.bak"
+	echo -e "\n* * * * * /bin/bash $file_1/gomtpv1.sh monitor" >> "$file_1/crontab.bak"
 	crontab "$file_1/crontab.bak"
 	rm -r "$file_1/crontab.bak"
-	cron_config=$(crontab -l | grep "mtproxy_go.sh monitor")
+	cron_config=$(crontab -l | grep "gomtpv1.sh monitor")
 	if [[ -z ${cron_config} ]]; then
 		echo -e "${Error} MTProxy 服务端运行状态监控功能 启动失败 !" && exit 1
 	else
@@ -555,10 +555,10 @@ crontab_monitor_cron_start(){
 }
 crontab_monitor_cron_stop(){
 	crontab -l > "$file_1/crontab.bak"
-	sed -i "/mtproxy_go.sh monitor/d" "$file_1/crontab.bak"
+	sed -i "/gomtpv1.sh monitor/d" "$file_1/crontab.bak"
 	crontab "$file_1/crontab.bak"
 	rm -r "$file_1/crontab.bak"
-	cron_config=$(crontab -l | grep "mtproxy_go.sh monitor")
+	cron_config=$(crontab -l | grep "gomtpv1.sh monitor")
 	if [[ ! -z ${cron_config} ]]; then
 		echo -e "${Error} MTProxy 服务端运行状态监控功能 停止失败 !" && exit 1
 	else
@@ -571,7 +571,7 @@ crontab_monitor(){
 	#echo "${PID}"
 	if [[ -z ${PID} ]]; then
 		echo -e "${Error} [$(date "+%Y-%m-%d %H:%M:%S %u %Z")] 检测到 MTProxy服务端 未运行 , 开始启动..." | tee -a ${mtproxy_log}
-		/etc/init.d/mtproxy-go start
+		/etc/init.d/gomtpv1 start
 		sleep 1s
 		check_pid
 		if [[ -z ${PID} ]]; then
@@ -585,7 +585,7 @@ crontab_monitor(){
 }
 Set_crontab_monitorip(){
 	check_crontab_installed_status
-	crontab_monitor_status=$(crontab -l|grep "mtproxy_go.sh monitorip")
+	crontab_monitor_status=$(crontab -l|grep "gomtpv1.sh monitorip")
 	if [[ -z "${crontab_monitor_status}" ]]; then
 		echo && echo -e "当前监控外网IP模式: ${Red_font_prefix}未开启${Font_color_suffix}" && echo
 		echo -e "确定要开启 ${Green_font_prefix}服务器外网IP变更监控${Font_color_suffix} 功能吗？(当服务器外网IP变化后，自动重新配置并重启服务端)[Y/n]"
@@ -610,11 +610,11 @@ Set_crontab_monitorip(){
 }
 crontab_monitor_cron_start2(){
 	crontab -l > "$file_1/crontab.bak"
-	sed -i "/mtproxy_go.sh monitorip/d" "$file_1/crontab.bak"
-	echo -e "\n* * * * * /bin/bash $file_1/mtproxy_go.sh monitorip" >> "$file_1/crontab.bak"
+	sed -i "/gomtpv1.sh monitorip/d" "$file_1/crontab.bak"
+	echo -e "\n* * * * * /bin/bash $file_1/gomtpv1.sh monitorip" >> "$file_1/crontab.bak"
 	crontab "$file_1/crontab.bak"
 	rm -r "$file_1/crontab.bak"
-	cron_config=$(crontab -l | grep "mtproxy_go.sh monitorip")
+	cron_config=$(crontab -l | grep "gomtpv1.sh monitorip")
 	if [[ -z ${cron_config} ]]; then
 		echo -e "${Error} 服务器外网IP变更监控功能 启动失败 !" && exit 1
 	else
@@ -623,10 +623,10 @@ crontab_monitor_cron_start2(){
 }
 crontab_monitor_cron_stop2(){
 	crontab -l > "$file_1/crontab.bak"
-	sed -i "/mtproxy_go.sh monitorip/d" "$file_1/crontab.bak"
+	sed -i "/gomtpv1.sh monitorip/d" "$file_1/crontab.bak"
 	crontab "$file_1/crontab.bak"
 	rm -r "$file_1/crontab.bak"
-	cron_config=$(crontab -l | grep "mtproxy_go.sh monitorip")
+	cron_config=$(crontab -l | grep "gomtpv1.sh monitorip")
 	if [[ ! -z ${cron_config} ]]; then
 		echo -e "${Error} 服务器外网IP变更监控功能 停止失败 !" && exit 1
 	else
@@ -699,13 +699,13 @@ Set_iptables(){
 	fi
 }
 Update_Shell(){
-	sh_new_ver=$(wget --no-check-certificate -qO- -t1 -T3 "https://raw.githubusercontent.com/heweiye/ToyoDAdoubiBackup/master/mtproxy_go.sh"|grep 'sh_ver="'|awk -F "=" '{print $NF}'|sed 's/\"//g'|head -1) && sh_new_type="github"
+	sh_new_ver=$(wget --no-check-certificate -qO- -t1 -T3 "https://raw.githubusercontent.com/wf-nb/Gomtpv1/master/gomtpv1.sh"|grep 'sh_ver="'|awk -F "=" '{print $NF}'|sed 's/\"//g'|head -1) && sh_new_type="github"
 	[[ -z ${sh_new_ver} ]] && echo -e "${Error} 无法链接到 Github !" && exit 0
-	if [[ -e "/etc/init.d/mtproxy-go" ]]; then
-		rm -rf /etc/init.d/mtproxy-go
+	if [[ -e "/etc/init.d/gomtpv1" ]]; then
+		rm -rf /etc/init.d/gomtpv1
 		Service
 	fi
-	wget -N --no-check-certificate "https://raw.githubusercontent.com/heweiye/ToyoDAdoubiBackup/master/mtproxy_go.sh" && chmod +x mtproxy_go.sh
+	wget -N --no-check-certificate "https://raw.githubusercontent.com/wf-nb/Gomtpv1/master/gomtpv1.sh" && chmod +x gomtpv1.sh
 	echo -e "脚本已更新为最新版本[ ${sh_new_ver} ] !(注意：因为更新方式为直接覆盖当前运行的脚本，所以可能下面会提示一些报错，无视即可)" && exit 0
 }
 check_sys
