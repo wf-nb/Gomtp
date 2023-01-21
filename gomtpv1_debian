@@ -37,8 +37,8 @@ read_config(){
 	nat_ipv4=$(cat ${CONF}|grep 'NAT-IPv4 = '|awk -F 'NAT-IPv4 = ' '{print $NF}')
 	nat_ipv6=$(cat ${CONF}|grep 'NAT-IPv6 = '|awk -F 'NAT-IPv6 = ' '{print $NF}')
 	secure=$(cat ${CONF}|grep 'SECURE = '|awk -F 'SECURE = ' '{print $NF}')
-	[[ ! -z "${nat_ipv4}" ]] && nat_ipv4="-4 \"${nat_ipv4}\""
-	[[ ! -z "${nat_ipv6}" ]] && nat_ipv6="-6 \"${nat_ipv6}\""
+	[[ ! -z "${nat_ipv4}" ]] && nat_ipv4="-4 \"${nat_ipv4}:${port}\""
+	[[ ! -z "${nat_ipv6}" ]] && nat_ipv6="-6 \"[${nat_ipv6}]:${port}\""
 	if [[ "${secure}" == "YES" ]]; then
 		secure="-s"
 	else
@@ -54,7 +54,7 @@ do_start(){
 		cd ${FILE}
 		echo -e "${Info} $NAME 启动中..."
 		ulimit -n 51200
-		eval nohup ./mtg run "${password}" -b [::]:${port} -4 $(echo ${nat_ipv4}) -6 $(echo ${nat_ipv6}) >> "${LOG}" 2>&1 &
+		eval nohup ./mtg run "${password}" -b [::]:${port} $(echo ${nat_ipv4}) $(echo ${nat_ipv6}) $(echo ${secure}) "${tag}" >> "${LOG}" 2>&1 &
 		sleep 2s
 		check_running
 		if [[ $? -eq 0 ]]; then
